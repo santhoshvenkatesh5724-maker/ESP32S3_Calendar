@@ -27,7 +27,12 @@
 
 #include "cJSON.h"
 
-#include "keys.c"
+#if __has_include("keys.c")
+    #include "keys.c"
+#else
+    #include "keys_template.c"
+
+#endif
 
 
 /* Event Settings */
