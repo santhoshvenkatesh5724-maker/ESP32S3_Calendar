@@ -4,3 +4,6 @@ This code uses JWT to get google calendar events and display them on ESP32S3 Wav
 ## How to use the example
 
 Update the file main/keys_template.c with the right credentials
+
+## Note
+This piece of shit is vibe coded, more improvements are to be made
