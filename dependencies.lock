@@ -12,13 +12,13 @@ dependencies:
   espressif/esp_lcd_touch:
     dependencies: []
     source:
-      path: /home/santhosh/espprojects/Waveshare_Calendar_Display/components/espressif__esp_lcd_touch
+      path: /home/santhosh/espprojects/ESP32S3_Calendar/components/espressif__esp_lcd_touch
       type: local
     version: 1.1.2
   espressif/esp_lcd_touch_gt911:
     dependencies: []
     source:
-      path: /home/santhosh/espprojects/Waveshare_Calendar_Display/components/espressif__esp_lcd_touch_gt911
+      path: /home/santhosh/espprojects/ESP32S3_Calendar/components/espressif__esp_lcd_touch_gt911
       type: local
     version: 1.1.1~1
   idf:
@@ -28,7 +28,7 @@ dependencies:
   lvgl/lvgl:
     dependencies: []
     source:
-      path: /home/santhosh/espprojects/Waveshare_Calendar_Display/components/lvgl__lvgl
+      path: /home/santhosh/espprojects/ESP32S3_Calendar/components/lvgl__lvgl
       type: local
     version: 8.4.0
 direct_dependencies:
@@ -37,6 +37,6 @@ direct_dependencies:
 - espressif/esp_lcd_touch_gt911
 - idf
 - lvgl/lvgl
-manifest_hash: 3009fdfb7a5474ca9949a52da6b9580c2e969121fbc0363b64677efc8094daee
+manifest_hash: f8559179729077a8b3c8f1f8fbd9ba3e203b702a608644d455c62caca3d91f14
 target: esp32s3
 version: 2.0.0
