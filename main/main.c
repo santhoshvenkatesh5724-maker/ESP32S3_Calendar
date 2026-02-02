@@ -5,11 +5,7 @@
 #include "wifi.h"
 #include "calendar.h"
 #include "jwt.h"
-
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-#include <stdlib.h>
+#include "ui.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -17,15 +13,6 @@
 
 #include "esp_log.h"
 #include "esp_system.h"
-#include "nvs_flash.h"
-#include "esp_wifi.h"
-#include "esp_sntp.h"
-#include "esp_event.h"
-#include "esp_netif.h"
-#include "esp_crt_bundle.h"
-#include "esp_http_client.h"
-
-#include "cJSON.h"
 
 void calendar_task(void *arg)
 {
@@ -40,39 +27,8 @@ void calendar_task(void *arg)
 
         parse_events_to_new_struct(parsed, &count);
 
-        if (count > 0) {
-            //print_all_events();
-        }
+        calendar_screen(count);
 
-        if (lvgl_port_lock(-1))
-        {
-            base_background();
-            int k=0;
-            int l=0;
-            for(int i=0; i<count; i++)
-            {
-                if(i>0)
-                {
-                    if(parsed[i].start_day == parsed[i-1].start_day && parsed[i].start_month == parsed[i-1].start_month)
-                    {
-                        k=k+1;
-                    }
-                    else
-                    {
-                        k=0;
-                        l = l + 1;
-                    }
-                }
-                
-                if(k == 0)
-                {
-                    date_month(80 + 160*l ,30, format_day_month_text(parsed[i].start_day, parsed[i].start_month));
-                }
-                waveshare_rect_event_box(5 + 160*(l) , 60 + 105*k, 150, 100, parsed[i].name, parsed[i].start_hhmm, parsed[i].end_hhmm);
-            }
-            lvgl_port_unlock();
-            ESP_LOGI("MAIN", "Calendar display updated");
-        }
         vTaskDelay(pdMS_TO_TICKS(1200000));
         esp_restart();
     }
