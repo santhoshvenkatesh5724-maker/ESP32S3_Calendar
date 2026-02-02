@@ -1,3 +1,4 @@
-keys.c
+jwt_config.c
+wifi_creds.c
 /build/
 /managed_components/
