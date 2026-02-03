@@ -75,10 +75,10 @@ esp_err_t waveshare_esp32_s3_rgb_lcd_init();
 esp_err_t wavesahre_rgb_lcd_bl_on();
 esp_err_t wavesahre_rgb_lcd_bl_off();
 
-void waveshare_rect_box(lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const char text[]);
-void waveshare_rect_event_box(lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const char text1[], const char text2[], const char text3[]);
-void base_background(void);
-void date_month(lv_coord_t x, lv_coord_t y, const char *text);
+void waveshare_rect_box(lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const char text[], lv_obj_t *scr);
+void waveshare_rect_event_box(lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const char text1[], const char text2[], const char text3[], lv_obj_t *scr);
+lv_obj_t *base_background(void);
+void date_month(lv_coord_t x, lv_coord_t y, const char *text, lv_obj_t *scr);
 
 
 #endif
