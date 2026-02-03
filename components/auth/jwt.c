@@ -13,6 +13,8 @@
 
 #include "cJSON.h"
 
+#include "esp_log.h"
+
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
@@ -92,8 +94,34 @@ char* create_jwt(void)
     return jwt;
 }
 
-char* fetch_access_token(void)
+esp_http_client_handle_t http_jwt_init(void)
 {
+    esp_http_client_config_t cfg = {
+        .url = JWT_TOKEN_URI,
+        .method = HTTP_METHOD_POST,
+        .transport_type = HTTP_TRANSPORT_OVER_SSL,
+        .crt_bundle_attach = esp_crt_bundle_attach,
+        .timeout_ms = HTTP_TIMEOUT_MS,
+        .keep_alive_enable = true,
+    };
+
+    return esp_http_client_init(&cfg);
+}
+
+void http_jwt_deinit(esp_http_client_handle_t client)
+{
+    esp_http_client_cleanup(client);
+}
+
+char* fetch_access_token(esp_http_client_handle_t client)
+{
+    if (!client) 
+    {
+        ESP_LOGE("JWT","JWT HTTP Init failed");
+        return NULL;
+    }
+    else ESP_LOGI("JWT","JWT HTTP Init success");
+
     char *jwt = create_jwt();
     if (!jwt) return NULL;
 
@@ -107,22 +135,6 @@ char* fetch_access_token(void)
     snprintf(body, body_len, "%s%s", prefix, enc_jwt);
     free(enc_jwt);
 
-    esp_http_client_config_t cfg = {
-        .url = JWT_TOKEN_URI,
-        .method = HTTP_METHOD_POST,
-        .transport_type = HTTP_TRANSPORT_OVER_SSL,
-        .crt_bundle_attach = esp_crt_bundle_attach,
-        .timeout_ms = HTTP_TIMEOUT_MS,
-        .buffer_size = HTTP_BUFFER_SIZE,
-        .buffer_size_tx = HTTP_TX_BUFFER_SIZE,
-    };
-
-    esp_http_client_handle_t client = esp_http_client_init(&cfg);
-    if (!client) {
-        free(body);
-        return NULL;
-    }
-
     esp_http_client_set_header(client, "Content-Type", "application/x-www-form-urlencoded");
     esp_http_client_set_post_field(client, body, strlen(body));
 
@@ -135,7 +147,6 @@ char* fetch_access_token(void)
     buf[len > 0 ? len : 0] = '\0';
 
     esp_http_client_close(client);
-    esp_http_client_cleanup(client);
     free(body);
 
     cJSON *root = cJSON_Parse(buf);
@@ -157,14 +168,14 @@ char* fetch_access_token(void)
     return result;
 }
 
-const char* get_access_token(void)
+const char* get_access_token(esp_http_client_handle_t jwt_http_handle)
 {
     time_t now = time(NULL);
     if (g_access_token && now < g_token_expiry) {
         return g_access_token;
     }
     
-    char *token = fetch_access_token();
+    char *token = fetch_access_token(jwt_http_handle);
     if (token) free(token);
     return g_access_token;
 }
