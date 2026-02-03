@@ -30,9 +30,11 @@ extern int g_event_count;
 extern ParsedEvent parsed[MAX_EVENTS];
 
 void clear_events(void);
-int fetch_calendar_events(const char *token);
+int fetch_calendar_events(const char *token, esp_http_client_handle_t client);
 int get_event_count(void);
 const calendar_event_t* get_event(int index);
 void parse_events_to_new_struct(ParsedEvent out_events[]);
 const char* format_day_month_text(int day, int month);
 ParsedEvent* return_calendar_events();
+esp_http_client_handle_t http_calendar_init();
+void http_calendar_deinit(esp_http_client_handle_t client);

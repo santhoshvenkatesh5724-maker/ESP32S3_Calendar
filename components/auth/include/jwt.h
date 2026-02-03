@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stdlib.h"
+#include "esp_http_client.h"
 #include <time.h>
 
 #define HTTP_TIMEOUT_MS 30000
@@ -17,5 +18,7 @@ extern char *g_access_token;
 extern time_t g_token_expiry;
 
 char* create_jwt(void);
-char* fetch_access_token(void);
-const char* get_access_token(void);
+char* fetch_access_token(esp_http_client_handle_t client);
+const char* get_access_token(esp_http_client_handle_t client);
+esp_http_client_handle_t http_jwt_init();
+void http_jwt_deinit(esp_http_client_handle_t client);

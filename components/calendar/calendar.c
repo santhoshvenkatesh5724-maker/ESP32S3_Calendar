@@ -8,6 +8,8 @@
 #include "jwt_config.h"
 #include "utils.h"
 
+#include "esp_log.h"
+
 const char *Calendar = "calendar";
 
 static const char *MONTH_NAMES[13] = {
@@ -26,12 +28,8 @@ void clear_events(void)
     memset(g_events, 0, sizeof(g_events));
 }
 
-int fetch_calendar_events(const char *token)
+esp_http_client_handle_t http_calendar_init()
 {
-    if (!token) return -1;
-
-    clear_events();
-
     char time_min[64];
     char time_max[64];
     iso8601_now(time_min, sizeof(time_min));
@@ -59,8 +57,29 @@ int fetch_calendar_events(const char *token)
     };
 
     esp_http_client_handle_t client = esp_http_client_init(&cfg);
-    if (!client) return -1;
 
+    return client;
+}
+
+void http_calendar_deinit(esp_http_client_handle_t client)
+{
+    esp_http_client_cleanup(client);
+}
+
+
+int fetch_calendar_events(const char *token, esp_http_client_handle_t client)
+{
+    if (!token) 
+    {
+        ESP_LOGE("Calendar","No token found");
+        return -1;
+    }
+    if (!client) 
+    {
+        ESP_LOGE("Calendar","Calendar HTTP Setup failed");
+        return -1;
+    }
+    
     size_t auth_len = strlen(token) + 32;
     char *auth = malloc(auth_len);
     snprintf(auth, auth_len, "Bearer %s", token);
@@ -80,9 +99,8 @@ int fetch_calendar_events(const char *token)
     buf[total] = '\0';
 
     esp_http_client_close(client);
-    esp_http_client_cleanup(client);
     free(auth);
-
+    
     if (status != 200 || total == 0) {
         free(buf);
         return -1;
