@@ -4,7 +4,7 @@
 #include "esp_http_client.h"
 
 #define MAX_EVENTS 50
-#define EVENT_TIME_WINDOW_DAYS 30  // Fetch events for next 30 days
+#define EVENT_TIME_WINDOW_DAYS 60  // Fetch events for next 30 days
 #define FETCH_INTERVAL_MS 60000    // Refresh every 60 seconds
 
 typedef struct {
@@ -25,18 +25,14 @@ typedef struct {
     char end_hhmm[6];     // "HH:MM"
 } ParsedEvent;
 
-static const char *MONTH_NAMES[13] = {
-    "", "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-};
-
 extern calendar_event_t g_events[MAX_EVENTS];
 extern int g_event_count;
 extern ParsedEvent parsed[MAX_EVENTS];
 
 void clear_events(void);
-int fetch_calendar_events(void);
+int fetch_calendar_events(const char *token);
 int get_event_count(void);
 const calendar_event_t* get_event(int index);
-void parse_events_to_new_struct(ParsedEvent out_events[], int *out_count);
+void parse_events_to_new_struct(ParsedEvent out_events[]);
 const char* format_day_month_text(int day, int month);
+ParsedEvent* return_calendar_events();

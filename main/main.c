@@ -14,23 +14,28 @@
 #include "esp_log.h"
 #include "esp_system.h"
 
-void calendar_task(void *arg)
+TaskHandle_t xHandle_Calendar = NULL;
+
+void new_calendar_event_task(void *arg)
 {
     while(1)
     {
-        int count = fetch_calendar_events();
-        if(count == -1)
+        char *access_token = get_access_token();
+        int event_count = fetch_calendar_events(access_token);
+        ParsedEvent* parsed = return_calendar_events();
+        if(event_count == -1)
         {
-            esp_restart();
+            vTaskDelete(xHandle_Calendar);
         }
-        ESP_LOGI("MAIN", "Fetched %d events", count);
-
-        parse_events_to_new_struct(parsed, &count);
-
-        calendar_screen(count);
-
-        vTaskDelay(pdMS_TO_TICKS(1200000));
-        esp_restart();
+        else 
+        {
+            calendar_screen(event_count, parsed);
+        }
+        ESP_LOGI("MEM", "Free heap: %d", esp_get_free_heap_size());
+        ESP_LOGI("MEM", "Min heap: %d", esp_get_minimum_free_heap_size());
+        ESP_LOGI("STACK", "Min free stack: %d", uxTaskGetStackHighWaterMark(xHandle_Calendar));
+        vTaskDelay(pdMS_TO_TICKS(10000));
+        ESP_LOGI("MAIN", "Update events");
     }
 
 }
@@ -40,16 +45,9 @@ void app_main(void)
 {
     waveshare_esp32_s3_rgb_lcd_init();
     vTaskDelay(pdMS_TO_TICKS(500));
-    if (lvgl_port_lock(-1))
-        {
-            base_background();
-            lvgl_port_unlock();
-        }
     init_wifi();
     sync_time();
     
-    ESP_LOGI("MAIN", "Display LVGL custom blue-rect demo");
-
-    xTaskCreatePinnedToCore(calendar_task, "calendar", 24 * 1024, NULL, 5, NULL, 0);
+    xTaskCreatePinnedToCore(new_calendar_event_task, "calendar", 24 * 1024, NULL, 5, &xHandle_Calendar, 0);
     
 }

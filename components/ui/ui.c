@@ -14,7 +14,7 @@
 #include "esp_log.h"
 #include "esp_system.h"
 
-void calendar_screen(int count)
+void calendar_screen(int count, ParsedEvent parsed[])
 {
     if (lvgl_port_lock(-1))
     {

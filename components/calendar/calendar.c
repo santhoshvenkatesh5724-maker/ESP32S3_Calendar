@@ -10,6 +10,12 @@
 
 const char *Calendar = "calendar";
 
+static const char *MONTH_NAMES[13] = {
+    "", "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+};
+
+
 calendar_event_t g_events[MAX_EVENTS];
 ParsedEvent parsed[MAX_EVENTS];
 int g_event_count;
@@ -20,9 +26,8 @@ void clear_events(void)
     memset(g_events, 0, sizeof(g_events));
 }
 
-int fetch_calendar_events(void)
+int fetch_calendar_events(const char *token)
 {
-    const char *token = get_access_token();
     if (!token) return -1;
 
     clear_events();
@@ -150,7 +155,7 @@ const calendar_event_t* get_event(int index)
     return &g_events[index];
 }
 
-void parse_events_to_new_struct(ParsedEvent out_events[], int *out_count)
+void parse_events_to_new_struct(ParsedEvent out_events[])
 {
     for (int i = 0; i < g_event_count; ++i) {
         ParsedEvent *dst = &out_events[i];
@@ -175,19 +180,13 @@ void parse_events_to_new_struct(ParsedEvent out_events[], int *out_count)
         // Format times into HH:MM
         sprintf(dst->start_hhmm, "%02d:%02d", st_h, st_m);
         sprintf(dst->end_hhmm,   "%02d:%02d", end_h, end_m);
-    }
-
-    *out_count = g_event_count;
+    } 
+    return;
 }
 
 const char* format_day_month_text(int day, int month)
 {
     static char buffer[32];
-
-    static const char *MONTH_NAMES[13] = {
-        "", "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    };
 
     if (month < 1 || month > 12) {
         return "Invalid";
@@ -195,4 +194,10 @@ const char* format_day_month_text(int day, int month)
 
     sprintf(buffer, "%02d %s", day, MONTH_NAMES[month]);
     return buffer;
+}
+
+ParsedEvent* return_calendar_events()
+{
+    parse_events_to_new_struct(parsed);
+    return parsed;
 }
