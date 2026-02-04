@@ -6,6 +6,7 @@
 #include "calendar.h"
 #include "jwt.h"
 #include "ui.h"
+#include "sd_card.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -51,6 +52,12 @@ void app_main(void)
     sync_time();
     calendar_http_handle = http_calendar_init();
     jwt_http_handle = http_jwt_init();
+
+    if(waveshare_sd_card_init() == ESP_OK)
+    {
+        // Test SD card functionality 
+        waveshare_sd_card_test();
+    }
     
     xTaskCreatePinnedToCore(new_calendar_event_task, "calendar", 24 * 1024, NULL, 5, &xHandle_Calendar, 0);
     
