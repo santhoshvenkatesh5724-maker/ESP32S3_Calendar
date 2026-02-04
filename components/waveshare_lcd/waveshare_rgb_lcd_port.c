@@ -208,10 +208,10 @@ esp_err_t wavesahre_rgb_lcd_bl_off()
     return ESP_OK;
 }
 
-void base_background(void)
+lv_obj_t *base_background(void)
 {
-    lv_obj_t *scr = lv_scr_act();
-    if (!scr) return;
+    lv_obj_t *scr = lv_obj_create(NULL);
+    if (!scr) return NULL;
 
     lv_obj_clean(scr);
 
@@ -221,6 +221,13 @@ void base_background(void)
 
     /* --- Remove screen padding so grid aligns to true pixel (0,0) --- */
     lv_obj_set_style_pad_all(scr, 0, LV_PART_MAIN);
+
+    return scr;
+}
+
+void grid_background(lv_obj_t *scr)
+{
+    if (!scr) return;
 
     /* Screen resolution */
     lv_coord_t scr_w = lv_disp_get_hor_res(NULL);
@@ -248,8 +255,8 @@ void base_background(void)
     lv_obj_clear_flag(grid, LV_OBJ_FLAG_CLICKABLE);
 
     /* Draw vertical lines */
-    for (lv_coord_t x = 0; x < scr_w; x += spacing) {
-
+    for (lv_coord_t x = 0; x < scr_w; x += spacing) 
+    {
         lv_obj_t *line = lv_obj_create(grid);
 
         lv_obj_set_size(line, line_w, line_h);
@@ -267,9 +274,8 @@ void base_background(void)
 }
 
 
-void date_month(lv_coord_t x, lv_coord_t y, const char *text)
+void date_month(lv_coord_t x, lv_coord_t y, const char *text, lv_obj_t *scr)
 {
-    lv_obj_t *scr = lv_scr_act();
     if (!scr) return;
 
     lv_obj_t *label = lv_label_create(scr);
@@ -283,9 +289,9 @@ void date_month(lv_coord_t x, lv_coord_t y, const char *text)
                                    y - (lv_disp_get_ver_res(NULL) / 2));
 }
 
-void waveshare_rect_box(lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const char text[])
+void waveshare_rect_box(lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const char text[], lv_obj_t *scr)
 {
-    lv_obj_t *scr = lv_scr_act();
+    if (!scr) return;
 
     /* Make screen background solid white */
     lv_obj_set_style_bg_color(scr, lv_color_white(), LV_PART_MAIN);
@@ -324,9 +330,9 @@ void waveshare_rect_box(lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, 
 
 }
 
-void waveshare_rect_event_box(lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const char text1[], const char text2[], const char text3[])
+void waveshare_rect_event_box(lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const char text1[], const char text2[], const char text3[], lv_obj_t *scr)
 {
-    lv_obj_t *scr = lv_scr_act();
+    if (!scr) return;
 
     /* Make screen background solid white */
     lv_obj_set_style_bg_color(scr, lv_color_white(), LV_PART_MAIN);
