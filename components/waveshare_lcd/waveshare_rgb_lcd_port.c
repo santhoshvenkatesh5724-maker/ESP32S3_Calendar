@@ -222,6 +222,13 @@ lv_obj_t *base_background(void)
     /* --- Remove screen padding so grid aligns to true pixel (0,0) --- */
     lv_obj_set_style_pad_all(scr, 0, LV_PART_MAIN);
 
+    return scr;
+}
+
+void grid_background(lv_obj_t *scr)
+{
+    if (!scr) return;
+
     /* Screen resolution */
     lv_coord_t scr_w = lv_disp_get_hor_res(NULL);
     lv_coord_t scr_h = lv_disp_get_ver_res(NULL);
@@ -248,8 +255,8 @@ lv_obj_t *base_background(void)
     lv_obj_clear_flag(grid, LV_OBJ_FLAG_CLICKABLE);
 
     /* Draw vertical lines */
-    for (lv_coord_t x = 0; x < scr_w; x += spacing) {
-
+    for (lv_coord_t x = 0; x < scr_w; x += spacing) 
+    {
         lv_obj_t *line = lv_obj_create(grid);
 
         lv_obj_set_size(line, line_w, line_h);
@@ -264,8 +271,6 @@ lv_obj_t *base_background(void)
         lv_obj_set_style_border_width(line, 0, LV_PART_MAIN);
         lv_obj_set_style_outline_width(line, 0, LV_PART_MAIN);
     }
-
-    return scr;
 }
 
 
