@@ -37,6 +37,13 @@ void new_calendar_event_task(void *arg)
         ESP_LOGI("MEM", "Free heap: %d", esp_get_free_heap_size());
         ESP_LOGI("MEM", "Min heap: %d", esp_get_minimum_free_heap_size());
         ESP_LOGI("STACK", "Min free stack: %d", uxTaskGetStackHighWaterMark(xHandle_Calendar));
+        vTaskDelay(pdMS_TO_TICKS(10000));
+        if(waveshare_sd_card_init() == ESP_OK)
+        {
+            // Test SD card functionality 
+            waveshare_sd_card_test();
+        }
+
         vTaskDelay(pdMS_TO_TICKS(1200000));
         esp_restart();
     }
@@ -51,14 +58,7 @@ void app_main(void)
     init_wifi();
     sync_time();
     calendar_http_handle = http_calendar_init();
-    jwt_http_handle = http_jwt_init();
-
-    if(waveshare_sd_card_init() == ESP_OK)
-    {
-        // Test SD card functionality 
-        waveshare_sd_card_test();
-    }
-    
+    jwt_http_handle = http_jwt_init(); 
     xTaskCreatePinnedToCore(new_calendar_event_task, "calendar", 24 * 1024, NULL, 5, &xHandle_Calendar, 0);
     
 }

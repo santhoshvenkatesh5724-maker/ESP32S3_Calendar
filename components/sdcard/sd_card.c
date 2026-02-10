@@ -61,7 +61,7 @@ esp_err_t waveshare_sd_card_init(esp_err_t i2c_handle)
     // Control CH422G to pull down the CS pin of the SD
     uint8_t write_buf = 0x01;
     i2c_master_write_to_device(I2C_MASTER_NUM, 0x24, &write_buf, 1, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
-    write_buf = 0x0A;
+    write_buf = 0x0E;
     i2c_master_write_to_device(I2C_MASTER_NUM, 0x38, &write_buf, 1, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
 
     // Options for mounting the filesystem
