@@ -3,7 +3,7 @@
 #include "esp_crt_bundle.h"
 #include "esp_http_client.h"
 
-#define MAX_EVENTS 50
+#define MAX_EVENTS 5
 #define EVENT_TIME_WINDOW_DAYS 60  // Fetch events for next 30 days
 #define FETCH_INTERVAL_MS 60000    // Refresh every 60 seconds
 

@@ -22,6 +22,7 @@ void calendar_screen(int count, ParsedEvent parsed[])
     if (lvgl_port_lock(-1))
     {
         calendar_screen_handle = base_background();
+        display_sd_image(calendar_screen_handle, "logo.jpg");
         grid_background(calendar_screen_handle);
         int k=0;
         int l=0;
@@ -53,12 +54,24 @@ void calendar_screen(int count, ParsedEvent parsed[])
 }
 
 
-void test_screen()
+void test_screen(void)
 {
-    if (lvgl_port_lock(-1))
-    {
-        test_screen_handle = base_background();
-        
-        lvgl_port_unlock();
-    }
+    if (!lvgl_port_lock(-1)) return;
+
+    test_screen_handle = base_background();
+
+    display_sd_image(test_screen_handle, "logo.jpg");
+
+    lv_scr_load(test_screen_handle);
+
+    lvgl_port_unlock();
+}
+
+void display_sd_image(lv_obj_t * parent, const char * file_name) 
+{
+    lv_obj_t * img = lv_img_create(parent);
+
+    lv_img_set_src(img, "S:/SCR/DISP1.jpg");
+
+    lv_obj_center(img);
 }

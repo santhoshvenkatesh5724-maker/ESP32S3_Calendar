@@ -6,6 +6,7 @@
 #include "calendar.h"
 #include "jwt.h"
 #include "ui.h"
+#include "sd_card.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -33,9 +34,6 @@ void new_calendar_event_task(void *arg)
         {
             calendar_screen(event_count, parsed);
         }
-        ESP_LOGI("MEM", "Free heap: %d", esp_get_free_heap_size());
-        ESP_LOGI("MEM", "Min heap: %d", esp_get_minimum_free_heap_size());
-        ESP_LOGI("STACK", "Min free stack: %d", uxTaskGetStackHighWaterMark(xHandle_Calendar));
         vTaskDelay(pdMS_TO_TICKS(1200000));
         esp_restart();
     }
@@ -46,12 +44,11 @@ void new_calendar_event_task(void *arg)
 void app_main(void)
 {
     waveshare_esp32_s3_rgb_lcd_init();
+    waveshare_sd_card_init();
     vTaskDelay(pdMS_TO_TICKS(500));
     init_wifi();
     sync_time();
     calendar_http_handle = http_calendar_init();
-    jwt_http_handle = http_jwt_init();
-    
+    jwt_http_handle = http_jwt_init(); 
     xTaskCreatePinnedToCore(new_calendar_event_task, "calendar", 24 * 1024, NULL, 5, &xHandle_Calendar, 0);
-    
 }
