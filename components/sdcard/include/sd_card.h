@@ -32,5 +32,9 @@
 // Function prototypes for initializing and testing SD card functions
 esp_err_t waveshare_sd_card_init();
 esp_err_t waveshare_sd_card_test();
+FRESULT list_dir (const char *path);
+int run_main_fs (void);
+FRESULT scan_files (char* path);
+void test_lvgl_sd_read(void);
 
 #endif

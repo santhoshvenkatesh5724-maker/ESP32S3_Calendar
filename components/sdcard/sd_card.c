@@ -1,4 +1,5 @@
 #include "sd_card.h"
+#include "lvgl.h"
 static const char *TAG = "example";
 
 sdmmc_card_t *card;
@@ -67,7 +68,7 @@ esp_err_t waveshare_sd_card_init(esp_err_t i2c_handle)
     // Options for mounting the filesystem
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
 #ifdef CONFIG_EXAMPLE_FORMAT_IF_MOUNT_FAILED
-        .format_if_mount_failed = true, // If mount fails, format the card
+        .format_if_mount_failed = false, // If mount fails, format the card
 #else
         .format_if_mount_failed = false, // If mount fails, do not format card
 #endif
@@ -214,4 +215,97 @@ esp_err_t waveshare_sd_card_test()
     // Deinitialize the SPI bus after all devices are removed
     spi_bus_free(host.slot);
     return ESP_OK;
+}
+
+FRESULT list_dir (const char *path)
+{
+    FRESULT res;
+    FF_DIR dir;
+    FILINFO fno;
+    int nfile, ndir;
+
+    res = f_opendir(&dir, path);                   /* Open the directory */
+    if (res == FR_OK) {
+        nfile = ndir = 0;
+        for (;;) {
+            res = f_readdir(&dir, &fno);           /* Read a directory item */
+            if (fno.fname[0] == 0) break;          /* Error or end of dir */
+            if (fno.fattrib & AM_DIR) {            /* It is a directory */
+                printf("   <DIR>   %s\n", fno.fname);
+                ndir++;
+            } else {                               /* It is a file */
+                printf("%10lu %s\n", fno.fsize, fno.fname);
+                nfile++;
+            }
+        }
+        f_closedir(&dir);
+        printf("%d dirs, %d files.\n", ndir, nfile);
+    } else {
+        printf("Failed to open %s  (%u)\n", path, res);
+    }
+    return res;
+}
+
+FRESULT scan_files (char* path)
+{
+    FRESULT res;
+    FF_DIR dir;
+    UINT i;
+    static FILINFO fno;
+
+    res = f_opendir(&dir, path);                   /* Open the directory */
+    if (res == FR_OK) {
+        for (;;) {
+            res = f_readdir(&dir, &fno);           /* Read a directory item */
+            if (fno.fname[0] == 0) break;          /* Break on error or end of dir */
+            if (fno.fattrib & AM_DIR) {            /* The item is a directory */
+                i = strlen(path);
+                sprintf(&path[i], "/%s", fno.fname);
+                res = scan_files(path);            /* Enter the directory */
+                if (res != FR_OK) break;
+                path[i] = 0;
+            } else {                               /* The item is a file. */
+                printf("%s/%s\n", path, fno.fname);
+            }
+        }
+        f_closedir(&dir);
+    }
+    return res;
+}
+
+
+int run_main_fs (void)
+{
+    FATFS fs;
+    FRESULT res;
+    char buff[256];
+
+
+    res = f_mount(&fs, "", 1);
+    if (res == FR_OK) {
+        strcpy(buff, "/");
+        res = scan_files(buff);
+    }
+
+    return res;
+}
+
+void test_lvgl_sd_read(void)
+{
+    lv_fs_dir_t dir;
+    lv_fs_res_t res;
+    
+    // Open directory using the 'S' drive letter you set in menuconfig
+    res = lv_fs_dir_open(&dir, "S:/"); 
+    if(res != LV_FS_RES_OK) {
+        ESP_LOGE(TAG, "LVGL FS could not open directory (Res: %d)", res);
+        return;
+    }
+
+    char fn[256];
+    while(lv_fs_dir_read(&dir, fn) == LV_FS_RES_OK && strlen(fn) > 0) {
+        printf("Found file: %s\n", fn);
+    }
+
+    lv_fs_dir_close(&dir);
 }
